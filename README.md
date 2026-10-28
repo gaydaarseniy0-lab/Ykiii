@@ -1,2 +1,41 @@
 # Ykiii
 Hfddd
+name: Build OXIDE APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Extract OXIDE project
+        run: |
+          unzip -q OXIDE-Android-Menu-v0.1-with-build-workflow.zip -d source
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        working-directory: source
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: OXIDE-Android-Menu-debug
+          path: source/app/build/outputs/apk/debug/app-debug.apk
